@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Trippy Trivia</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .board { display: grid; grid-template-columns: repeat(5, 80px); width: 400px; margin: auto; }
+        .cell { width: 80px; height: 80px; border: 1px solid black; display: flex; justify-content: center; align-items: center; }
+        .player { width: 20px; height: 20px; border-radius: 50%; position: absolute; }
+        .red { background-color: red; }
+        .blue { background-color: blue; }
+        .green { background-color: green; }
+        .yellow { background-color: yellow; }
+    </style>
+    <script>
+        function rollDice(direction) {
+            fetch('/roll_dice', {
+                method: 'POST',
+                body: JSON.stringify({ "direction": direction }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('gameState').innerText = JSON.stringify(data.game_state, null, 2);
+                alert("You rolled a " + data.dice);
+                updateBoard(data.game_state.players);
+            });
+        }
+
+        function submitAnswer() {
+            let answer = document.getElementById("answerInput").value;
+            fetch('/answer_question', {
+                method: 'POST',
+                body: JSON.stringify({ "answer": answer }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('gameState').innerText = JSON.stringify(data.game_state, null, 2);
+                alert(data.correct ? "Correct!" : "Wrong answer.");
+            });
+        }
+
+        function updateBoard(players) {
+            document.querySelectorAll(".player").forEach(e => e.remove());
+            for (let player in players) {
+                let pos = players[player].position;
+                let color = players[player].color;
+                let cell = document.getElementById(`cell-${pos}`);
+                let piece = document.createElement("div");
+                piece.className = "player " + color;
+                cell.appendChild(piece);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Trippy Trivia</h1>
+    <p>Choose a direction and roll the dice:</p>
+    <button onclick="rollDice('clockwise')">Roll Clockwise</button>
+    <button onclick="rollDice('counterclockwise')">Roll Counterclockwise</button>
+    
+    <h2>Answer Trivia</h2>
+    <input type="text" id="answerInput" placeholder="Type your answer">
+    <button onclick="submitAnswer()">Submit Answer</button>
+
+    <h3>Game Board</h3>
+    <div class="board">
+        <div id="cell-0" class="cell"></div>
+        <div id="cell-1" class="cell"></div>
+        <div id="cell-2" class="cell"></div>
+        <div id="cell-3" class="cell"></div>
+        <div id="cell-4" class="cell"></div>
+        <div id="cell-5" class="cell"></div>
+        <div id="cell-6" class="cell"></div>
+        <div id="cell-7" class="cell"></div>
+        <div id="cell-8" class="cell"></div>
+        <div id="cell-9" class="cell"></div>
+        <div id="cell-10" class="cell"></div>
+        <div id="cell-11" class="cell"></div>
+        <div id="cell-12" class="cell"></div>
+        <div id="cell-13" class="cell"></div>
+        <div id="cell-14" class="cell"></div>
+        <div id="cell-15" class="cell"></div>
+        <div id="cell-16" class="cell"></div>
+        <div id="cell-17" class="cell"></div>
+        <div id="cell-18" class="cell"></div>
+        <div id="cell-19" class="cell"></div>
+        <div id="cell-20" class="cell"></div>
+        <div id="cell-21" class="cell"></div>
+        <div id="cell-22" class="cell"></div>
+        <div id="cell-23" class="cell"></div>
+    </div>
+
+    <h3>Game State</h3>
+    <pre id="gameState"></pre>
+</body>
+</html>
